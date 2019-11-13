@@ -1,30 +1,45 @@
+import time
 from influxdb import InfluxDBClient
+from functions import *
 
 
 client = InfluxDBClient('localhost', 8086, 'root', 'root', 'medidas')
 
-def get_cpu_temp():
-    path="/sys/class/thermal/thermal_zone0/temp"
-    f = open(path, "r")
-    temp_raw = int(f.read().strip())
-    temp_cpu = float(temp_raw / 1000.0)
-    return temp_cpu
+cpu_name = get_cpu_name()
 
-# Figure out the best way to organize this project
-json_body = [
-    {
-        "measurement": "cpu_load_short",
-        "tags": {
-            "host": "server01",
-            "region": "us-west"
-        },
-        "time": "2009-11-10T23:00:00Z",
-        "fields": {
-            "value": 0.64
-        }
-    }
-]
+def get_data():
+    iso = time.ctime()
+    cpu_temp = get_cpu_temp()
+    free_mem = get_mem_free()
 
+    print('cpu_temp', cpu_temp)
+    print('free_mem', free_mem)
+
+    json_body = [
+            {
+                "measurement": "ambient_celcius",
+                "tags": {"host": 'My Laptop'},
+                "time": iso,
+                "fields": {
+                    "value": cpu_temp,
+                    },
+                "measurement": "free_mem",
+                "tags": {"host": 'My laptop'},
+                "time": iso,
+                "fields": {
+                    "value": free_mem,
+                    },
+            }
+            ]
+
+    return json_body
+
+# If database hasn't been created yet
 client.create_database('medidas')
 
-#client.write_points(json_body)
+sleep_duration = 1
+while True:
+    json_body = get_data()
+    client.write_points(json_body)
+    print (".")
+    time.sleep(sleep_duration)
