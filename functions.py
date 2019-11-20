@@ -1,3 +1,4 @@
+
 """
 Here's a bunch of functions to get information from the machine
 Daijoubu
@@ -16,12 +17,21 @@ def get_cpu_temp():
     f.close()
     return temp_cpu
 
-def get_cpu_averageload():
+def _get_cpu_averageload():
     path = "/proc/loadavg"
     f = open(path, "r")
     averages = f.read().strip().split(" ")
     f.close()
     return averages
+
+def get_system_load_last_min():
+    return _get_cpu_averageload()[0]
+
+def get_last_pid():
+    return _get_cpu_averageload()[-1]
+
+def get_processes_threads():
+    return _get_cpu_averageload()[3]
 
 def get_cpu_name():
     path = "/proc/cpuinfo"
@@ -51,13 +61,16 @@ def get_mem_free():
 def get_mem_avail():
     return _get_mem_usage()[2].split()[1]
 
-def get_current_logged_users():
+def _get_current_logged_users():
     # https://linuxhandbook.com/linux-login-history/
     # /var/run/utmp
     result = execute_shell('who')
     # https://stackoverflow.com/questions/606191/convert-bytes-to-a-string
     return str(result, 'utf8')
 
+def get_number_of_logged_users():
+    output = _get_current_logged_users()
+    return len(output.splitlines())
 
 # https://unix.stackexchange.com/questions/55212/how-can-i-monitor-disk-io
 # TODO: write I/O stuff and NETWORK stuff
