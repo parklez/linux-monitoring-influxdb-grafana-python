@@ -1,6 +1,10 @@
 # linux-monitoring-influxdb-grafana-python
 This is a program that fetches a lot of information from the linux virtual filesystem, such as cpu temperature, ram usage, network traffic, as well as calling a few bash commands such as 'who' and 'ps'. Then writes all information into InfluxDB so that Grafana can render some nice graphics with all that.
 
+<p align="center">
+    <img src="https://github.com/parklez/linux-monitoring-influxdb-grafana-python/blob/master/screenshot.png" height="400"/>
+</p>
+
 ## Dependencies
 - Python 3
 - influxdb-python [Github link](https://github.com/influxdata/influxdb-python)
