@@ -31,7 +31,7 @@ def get_last_pid():
     return _get_cpu_averageload()[-1]
 
 def get_processes_threads():
-    return _get_cpu_averageload()[3]
+    return _get_cpu_averageload()[3].split("/")[1]
 
 def get_cpu_name():
     path = "/proc/cpuinfo"
@@ -72,5 +72,65 @@ def get_number_of_logged_users():
     output = _get_current_logged_users()
     return len(output.splitlines())
 
+def get_uptime():
+    path="/proc/uptime"
+    f = open(path, "r")
+    uptime = f.read().split(" ")
+    f.close()
+    return float(uptime[0])
+
+def get_number_of_processes_since_boot():
+    path = "/proc/stat"
+    f = open(path, "r")
+    for line in f:
+        if line.startswith("processes"):
+            break
+    f.close()
+    return int(line.split()[1])
+
+_received = -1
+_sent = -1
+
+#Network I/O could've been written using /proc/stat, it might sum up use from all network devices.
+def get_received_bytes():
+    'returns bytes worth of traffic since last call'
+    received_path = '/sys/class/net/wlp2s0/statistics/rx_bytes'
+
+    rf = open(received_path, 'r')
+
+    data = int(rf.read())
+    rf.close()
+    
+    global _received
+
+    if _received == -1:
+        _received = data
+        return 0
+    
+    else:
+        diff =  data - _received
+        _received = data
+        return diff
+
+def get_sent_bytes():
+    'returns bytes worth of traffic since last call'
+    sent_path = '/sys/class/net/wlp2s0/statistics/tx_bytes'
+
+    sf = open(sent_path, 'r')
+
+    data = int(sf.read())
+    sf.close()
+    
+    global _sent
+
+    if _sent == -1:
+        _sent = data
+        return 0
+    
+    else:
+        diff =  data - _sent
+        _sent = data
+        return diff
+
 # https://unix.stackexchange.com/questions/55212/how-can-i-monitor-disk-io
-# TODO: write I/O stuff and NETWORK stuff
+# TODO: write I/O stuff

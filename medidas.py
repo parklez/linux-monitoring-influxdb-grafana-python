@@ -10,7 +10,7 @@ cpu_name = get_cpu_name()
 
 def get_data():
 
-    # Make threads for all these:
+    # TODO: Make threads for all these:
     iso = time.ctime()
     cpu_temp = get_cpu_temp()
     free_mem = int(get_mem_free())
@@ -18,14 +18,15 @@ def get_data():
     logged_users = get_number_of_logged_users()
     last_pid = int(get_last_pid())
     avg_load = float(get_system_load_last_min())
-    cpu_pt = get_processes_threads()
-    #
+    cpu_pt = int(get_processes_threads())
+    uptime = get_uptime()
+    net_received = get_received_bytes()
+    net_sent = get_sent_bytes()
+
     if debug:
         print('cpu_temp', cpu_temp)
-        print('free_mem', free_mem)
         print('used_mem', used_mem)
         print('logged_users', logged_users)
-
 
     json_body = [
                 {
@@ -74,6 +75,30 @@ def get_data():
                 "time": iso,
                 "fields": {
                     "value": cpu_pt,
+                    }
+                },
+                {
+                "measurement": "uptime",
+                "tags": {"host": 'My Laptop'},
+                "time": iso,
+                "fields": {
+                    "value": uptime,
+                    }
+                },
+                {
+                "measurement": "net_received",
+                "tags": {"host": 'My Laptop'},
+                "time": iso,
+                "fields": {
+                    "value": net_received,
+                    }
+                },
+                {
+                "measurement": "net_sent",
+                "tags": {"host": 'My Laptop'},
+                "time": iso,
+                "fields": {
+                    "value": net_sent,
                     }
                 },
                 {
